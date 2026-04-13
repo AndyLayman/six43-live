@@ -47,17 +47,17 @@ export default function Home() {
         </div>
       )}
 
-      {/* Layer 2: Baseball Overlay — fixed sizes, not affected by window scaling */}
-      <div className="absolute inset-0 pointer-events-none">
+      {/* Layer 2: Baseball Overlay — scales with viewport via vw-based font-size */}
+      <div className="absolute inset-0 pointer-events-none" style={{ fontSize: "1.2vw" }}>
         {/* Top-left: Scoreboard + Count */}
-        <div className="absolute top-4 left-4 flex flex-col gap-2 pointer-events-auto">
+        <div className="absolute pointer-events-auto" style={{ top: "1.5em", left: "1.5em", display: "flex", flexDirection: "column", gap: "0.4em" }}>
           <Scoreboard
             away={awayTeam}
             home={homeTeam}
             inning={inning}
             isTopInning={isTopInning}
           />
-          <div className="flex gap-2">
+          <div style={{ display: "flex", gap: "0.4em" }}>
             <CountIndicator balls={balls} strikes={strikes} outs={outs} />
             <BasesIndicator
               first={bases.first}
@@ -68,7 +68,7 @@ export default function Home() {
         </div>
 
         {/* Top-right: Inning tracker */}
-        <div className="absolute top-4 right-4 pointer-events-auto">
+        <div className="absolute pointer-events-auto" style={{ top: "1.5em", right: "1.5em" }}>
           <InningTracker
             currentInning={inning}
             isTopInning={isTopInning}
