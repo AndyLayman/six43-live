@@ -35,7 +35,7 @@ export default function GameOverlay({
         style={{
           display: "grid",
           gridTemplateColumns: `${CELL} ${CELL} ${CELL} 6em`,
-          gridTemplateRows: `3.2em ${CELL} ${CELL}`,
+          gridTemplateRows: `2.3em ${CELL} ${CELL}`,
         }}
       >
         {/* Bases diamond — row 1, col 4, triangle background */}
@@ -45,8 +45,9 @@ export default function GameOverlay({
             gridRow: 1,
             position: "relative",
             display: "flex",
-            alignItems: "center",
+            alignItems: "flex-end",
             justifyContent: "center",
+            paddingBottom: "0.1em",
           }}
         >
           {/* Triangle background shape */}
@@ -113,7 +114,7 @@ export default function GameOverlay({
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
-            gap: "0.2em",
+            gap: "0.1em",
             paddingLeft: "0.6em",
           }}
         >
