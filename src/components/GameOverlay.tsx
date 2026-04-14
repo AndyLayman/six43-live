@@ -25,7 +25,10 @@ interface GameOverlayProps {
 
 const CELL = "2.5em";
 
-/* Six43 defaults — used when no team colors/logo provided */
+/* Padres "us" defaults */
+const US_BG = "#2F241F";
+const US_FG = "#FFC425";
+/* Generic opponent defaults */
 const DEFAULT_BG = "#111111";
 const DEFAULT_FG = "#F7F7F7";
 
@@ -41,8 +44,8 @@ export default function GameOverlay({
   batter,
 }: GameOverlayProps) {
   const battingTeam = isTopInning ? away : home;
-  const battingBg = battingTeam.colorBg || DEFAULT_BG;
-  const battingFg = battingTeam.colorFg || DEFAULT_FG;
+  const battingBg = battingTeam.colorBg || (battingTeam.isUs ? US_BG : DEFAULT_BG);
+  const battingFg = battingTeam.colorFg || (battingTeam.isUs ? US_FG : DEFAULT_FG);
 
   return (
     <div style={{ display: "inline-flex", flexDirection: "column" }}>
@@ -212,8 +215,8 @@ function TeamCell({
   row: number;
   team: TeamInfo;
 }) {
-  const bg = team.colorBg || DEFAULT_BG;
-  const fg = team.colorFg || DEFAULT_FG;
+  const bg = team.colorBg || (team.isUs ? US_BG : DEFAULT_BG);
+  const fg = team.colorFg || (team.isUs ? US_FG : DEFAULT_FG);
   const hasLogo = !!team.logoSvg;
 
   return (
