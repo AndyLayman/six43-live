@@ -48,60 +48,39 @@ export default function GameOverlay({
   const battingFg = battingTeam.colorFg || (battingTeam.isUs ? US_FG : DEFAULT_FG);
 
   return (
-    <div style={{ display: "inline-flex", flexDirection: "column" }}>
+    <div style={{ display: "inline-flex", flexDirection: "column", position: "relative" }}>
+      {/* 3D Bases diamond — hangs off the top */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: "100%",
+          left: "50%",
+          transform: "translateX(-50%)",
+          marginBottom: "-0.3em",
+          zIndex: 2,
+        }}
+      >
+        <BaseDiamond bases={bases} activeColor={battingBg} activeBorder={battingFg} />
+      </div>
+
       {/* Main scoreboard grid */}
       <div
         style={{
           display: "grid",
           gridTemplateColumns: `${CELL} ${CELL} 0.15em ${CELL} 0.15em 6em`,
-          gridTemplateRows: `3em ${CELL} 0.15em ${CELL}`,
-          overflow: "visible",
+          gridTemplateRows: `${CELL} 0.15em ${CELL}`,
         }}
       >
-        {/* Bases diamond — row 1, col 6, triangle background */}
-        <div
-          style={{
-            gridColumn: 6,
-            gridRow: 1,
-            position: "relative",
-            overflow: "visible",
-            zIndex: 2,
-          }}
-        >
-          {/* Triangle + extension to prevent gap at bottom */}
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              bottom: "-0.15em",
-              background: "var(--chalk)",
-              clipPath: "polygon(50% 0%, 0% calc(100% - 0.15em), 0% 100%, 100% 100%, 100% calc(100% - 0.15em))",
-            }}
-          />
-          {/* Diamond content — positioned at bottom center, allowed to overflow */}
-          <div
-            style={{
-              position: "absolute",
-              bottom: "-0.4em",
-              left: "50%",
-              transform: "translateX(-50%)",
-              zIndex: 1,
-            }}
-          >
-            <BaseDiamond bases={bases} activeColor={battingBg} activeBorder={battingFg} />
-          </div>
-        </div>
-
         {/* Away team cell */}
-        <TeamCell row={2} team={away} />
+        <TeamCell row={1} team={away} />
         {/* Away score cell */}
-        <ScoreCell row={2} score={away.score} />
+        <ScoreCell row={1} score={away.score} />
 
-        {/* Inning — rows 2–4, col 4 */}
+        {/* Inning — rows 1–3, col 4 */}
         <div
           style={{
             gridColumn: 4,
-            gridRow: "2 / 5",
+            gridRow: "1 / 4",
             background: "var(--chalk)",
             display: "flex",
             flexDirection: "column",
@@ -134,11 +113,11 @@ export default function GameOverlay({
           />
         </div>
 
-        {/* Count (O/S/B) — rows 2–4, col 6 */}
+        {/* Count (O/S/B) — rows 1–3, col 6 */}
         <div
           style={{
             gridColumn: 6,
-            gridRow: "2 / 5",
+            gridRow: "1 / 4",
             background: "var(--chalk)",
             display: "flex",
             flexDirection: "column",
@@ -154,9 +133,9 @@ export default function GameOverlay({
         </div>
 
         {/* Home team cell */}
-        <TeamCell row={4} team={home} />
+        <TeamCell row={3} team={home} />
         {/* Home score cell */}
-        <ScoreCell row={4} score={home.score} />
+        <ScoreCell row={3} score={home.score} />
       </div>
 
       {/* Batter bar */}
@@ -309,30 +288,63 @@ function BaseDiamond({
   return (
     <div
       style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
+        perspective: "12em",
+        perspectiveOrigin: "50% 20%",
       }}
     >
-      <Diamond active={bases.second} activeColor={activeColor} activeBorder={activeBorder} />
-      <div style={{ display: "flex", gap: "0.9em", marginTop: "-0.2em" }}>
-        <Diamond active={bases.third} activeColor={activeColor} activeBorder={activeBorder} />
-        <Diamond active={bases.first} activeColor={activeColor} activeBorder={activeBorder} />
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1.6em 1.6em",
+          gridTemplateRows: "1.6em 1.6em",
+          gap: "0.2em",
+          transform: "rotateX(55deg) rotate(45deg)",
+          transformStyle: "preserve-3d",
+        }}
+      >
+        {/* Second base — top left in rotated grid */}
+        <Diamond active={bases.second} activeColor={activeColor} activeBorder={activeBorder} style={{ gridColumn: 1, gridRow: 1 }} />
+        {/* Third base — bottom left */}
+        <Diamond active={bases.third} activeColor={activeColor} activeBorder={activeBorder} style={{ gridColumn: 1, gridRow: 2 }} />
+        {/* First base — top right */}
+        <Diamond active={bases.first} activeColor={activeColor} activeBorder={activeBorder} style={{ gridColumn: 2, gridRow: 1 }} />
+        {/* Home plate marker — bottom right */}
+        <div
+          style={{
+            gridColumn: 2,
+            gridRow: 2,
+            width: "1.6em",
+            height: "1.6em",
+            background: "var(--chalk)",
+            border: "0.12em solid var(--night-game)",
+            opacity: 0.3,
+          }}
+        />
       </div>
     </div>
   );
 }
 
-function Diamond({ active, activeColor, activeBorder }: { active: boolean; activeColor: string; activeBorder: string }) {
+function Diamond({
+  active,
+  activeColor,
+  activeBorder,
+  style,
+}: {
+  active: boolean;
+  activeColor: string;
+  activeBorder: string;
+  style?: React.CSSProperties;
+}) {
   return (
     <div
       style={{
-        width: "1.3em",
-        height: "1.3em",
-        transform: "rotate(45deg)",
-        border: `0.13em solid ${active ? activeBorder : "var(--night-game)"}`,
+        width: "1.6em",
+        height: "1.6em",
+        border: `0.12em solid ${active ? activeBorder : "var(--night-game)"}`,
         background: active ? activeColor : "var(--chalk)",
         transition: "all var(--duration-fast) var(--ease-in-out)",
+        ...style,
       }}
     />
   );
