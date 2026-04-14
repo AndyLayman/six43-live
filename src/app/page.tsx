@@ -15,6 +15,7 @@ export default function Home() {
   const [showUrlBar, setShowUrlBar] = useState(false);
   const [gameId, setGameId] = useState<string | null>(null);
   const [streamStatus, setStreamStatus] = useState<"checking" | "live" | "offline" | "manual">("checking");
+  const [nextGameTime, setNextGameTime] = useState<Date | null>(null);
 
   // Check if the team YouTube channel is live
   const checkLiveStatus = useCallback(async () => {
@@ -33,17 +34,11 @@ export default function Home() {
     }
   }, []);
 
-  // Poll for live status
+  // Find the active or next upcoming game
   useEffect(() => {
-    checkLiveStatus();
-    const interval = setInterval(checkLiveStatus, 30000);
-    return () => clearInterval(interval);
-  }, [checkLiveStatus]);
-
-  // Find the active game on load
-  useEffect(() => {
-    async function findActiveGame() {
-      const { data } = await supabase
+    async function findGame() {
+      // First check for an in-progress game
+      const { data: activeGame } = await supabase
         .from("games")
         .select("id")
         .eq("status", "in_progress")
@@ -51,12 +46,67 @@ export default function Home() {
         .limit(1)
         .single();
 
-      if (data) {
-        setGameId(data.id);
+      if (activeGame) {
+        setGameId(activeGame.id);
+        // Game is active — start polling YouTube immediately
+        checkLiveStatus();
+        return;
+      }
+
+      // Find the next scheduled game
+      const today = new Date().toISOString().split("T")[0];
+      const { data: nextGame } = await supabase
+        .from("games")
+        .select("id, date, game_time")
+        .eq("status", "scheduled")
+        .gte("date", today)
+        .order("date", { ascending: true })
+        .limit(1)
+        .single();
+
+      if (nextGame) {
+        setGameId(nextGame.id);
+        // Parse game start time
+        const [hours, minutes] = (nextGame.game_time || "12:00").split(":").map(Number);
+        const gameStart = new Date(nextGame.date + "T00:00:00");
+        gameStart.setHours(hours, minutes, 0, 0);
+        setNextGameTime(gameStart);
+      } else {
+        setStreamStatus("offline");
       }
     }
-    findActiveGame();
-  }, []);
+    findGame();
+  }, [checkLiveStatus]);
+
+  // Poll YouTube only when within 15 minutes of game time, or game is in progress
+  useEffect(() => {
+    if (streamStatus === "live" || streamStatus === "manual") return;
+
+    // If no next game time, don't poll (already handled in findGame for active games)
+    if (!nextGameTime) return;
+
+    function shouldPoll() {
+      if (!nextGameTime) return false;
+      const minutesUntilGame = (nextGameTime.getTime() - Date.now()) / 60000;
+      return minutesUntilGame <= 15;
+    }
+
+    if (shouldPoll()) {
+      // Within 15 minutes — start polling every 30s
+      checkLiveStatus();
+      const interval = setInterval(checkLiveStatus, 30000);
+      return () => clearInterval(interval);
+    } else {
+      // Not yet close — check once per minute if we've entered the window
+      setStreamStatus("offline");
+      const interval = setInterval(() => {
+        if (shouldPoll()) {
+          checkLiveStatus();
+        }
+      }, 60000);
+      return () => clearInterval(interval);
+    }
+  }, [nextGameTime, streamStatus, checkLiveStatus]);
 
   const { game, gameState, currentBatter, balls, strikes, loading } = useGameData(gameId);
   const { floatingReactions, isCelebrating, sendReaction } = useReactions(gameId);
@@ -122,10 +172,15 @@ export default function Home() {
             <p style={{ fontSize: "0.85em", color: "var(--text-dim)", marginTop: "0.3em" }}>
               {streamStatus === "checking"
                 ? "Connecting to YouTube..."
-                : streamStatus === "offline"
-                ? "Waiting for stream to go live — or press TV to load manually"
-                : "Press TV to load a stream manually"}
+                : nextGameTime
+                ? `Next game: ${nextGameTime.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })} at ${nextGameTime.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}`
+                : "No upcoming games scheduled"}
             </p>
+            {streamStatus !== "checking" && (
+              <p style={{ fontSize: "0.75em", color: "var(--text-dim)", marginTop: "0.2em" }}>
+                Stream auto-connects 15 min before game time — or press TV
+              </p>
+            )}
           </div>
         )}
 
