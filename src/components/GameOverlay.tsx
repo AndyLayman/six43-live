@@ -365,9 +365,9 @@ function CountRow({
 function PadresLogo({ color = "currentColor" }: { color?: string }) {
   return (
     <svg
-      width="1.4em"
-      height="1em"
-      viewBox="0 0 560 400"
+      width="2em"
+      height="1.8em"
+      viewBox="170 60 230 300"
       xmlns="http://www.w3.org/2000/svg"
       fillRule="evenodd"
       clipRule="evenodd"
