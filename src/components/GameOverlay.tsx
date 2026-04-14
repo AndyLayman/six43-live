@@ -308,11 +308,11 @@ function CountRow({
           <div
             key={i}
             style={{
-              width: "0.45em",
-              height: "0.45em",
+              width: "0.5em",
+              height: "0.5em",
               borderRadius: "50%",
-              border: `2px solid ${i < filled ? color : "var(--night-game)"}`,
-              background: i < filled ? color : "var(--chalk)",
+              border: `0.1em solid ${i < filled ? color : "var(--night-game)"}`,
+              background: i < filled ? color : "transparent",
               transition: "all var(--duration-fast) var(--ease-in-out)",
             }}
           />
