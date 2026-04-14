@@ -1,6 +1,5 @@
 "use client";
 
-import { NavArrowUp, NavArrowDown } from "iconoir-react/regular";
 import { NavArrowUp as NavArrowUpSolid, NavArrowDown as NavArrowDownSolid } from "iconoir-react/solid";
 
 interface GameOverlayProps {
@@ -80,14 +79,15 @@ export default function GameOverlay({
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            gap: "0.25em",
+            gap: "0.4em",
           }}
         >
-          {isTopInning ? (
-            <NavArrowUpSolid width="0.9em" height="0.9em" color="var(--night-game)" />
-          ) : (
-            <NavArrowUp width="0.9em" height="0.9em" color="var(--night-game)" style={{ opacity: 0.2 }} />
-          )}
+          <NavArrowUpSolid
+            width="0.9em"
+            height="0.9em"
+            color={isTopInning ? "var(--night-game)" : "var(--chalk)"}
+            style={isTopInning ? undefined : { stroke: "var(--night-game)", strokeWidth: 1 }}
+          />
           <span
             style={{
               fontSize: "1.2em",
@@ -98,11 +98,12 @@ export default function GameOverlay({
           >
             {inning}
           </span>
-          {!isTopInning ? (
-            <NavArrowDownSolid width="0.9em" height="0.9em" color="var(--night-game)" />
-          ) : (
-            <NavArrowDown width="0.9em" height="0.9em" color="var(--night-game)" style={{ opacity: 0.2 }} />
-          )}
+          <NavArrowDownSolid
+            width="0.9em"
+            height="0.9em"
+            color={!isTopInning ? "var(--night-game)" : "var(--chalk)"}
+            style={!isTopInning ? undefined : { stroke: "var(--night-game)", strokeWidth: 1 }}
+          />
         </div>
 
         {/* Count (O/S/B) — rows 2–4, col 6 */}
