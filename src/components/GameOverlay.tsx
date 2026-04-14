@@ -55,17 +55,15 @@ export default function GameOverlay({
           display: "grid",
           gridTemplateColumns: `${CELL} ${CELL} 0.15em ${CELL} 0.15em 6em`,
           gridTemplateRows: `3em ${CELL} 0.15em ${CELL}`,
+          overflow: "visible",
         }}
       >
-        {/* Bases diamond — row 1, col 4, triangle background */}
+        {/* Bases diamond — row 1, col 6, triangle background */}
         <div
           style={{
             gridColumn: 6,
             gridRow: 1,
             position: "relative",
-            display: "flex",
-            alignItems: "flex-end",
-            justifyContent: "center",
             overflow: "visible",
           }}
         >
@@ -78,8 +76,16 @@ export default function GameOverlay({
               clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)",
             }}
           />
-          {/* Diamond content (not clipped) */}
-          <div style={{ position: "relative", zIndex: 1, transform: "translateY(0.4em)" }}>
+          {/* Diamond content — positioned at bottom center, allowed to overflow */}
+          <div
+            style={{
+              position: "absolute",
+              bottom: "-0.4em",
+              left: "50%",
+              transform: "translateX(-50%)",
+              zIndex: 1,
+            }}
+          >
             <BaseDiamond bases={bases} activeColor={battingBg} activeBorder={battingFg} />
           </div>
         </div>
