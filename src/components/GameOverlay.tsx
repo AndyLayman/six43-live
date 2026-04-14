@@ -47,7 +47,7 @@ export default function GameOverlay({
             display: "flex",
             alignItems: "flex-end",
             justifyContent: "center",
-            paddingBottom: "0.1em",
+            overflow: "visible",
           }}
         >
           {/* Triangle background shape */}
@@ -60,7 +60,7 @@ export default function GameOverlay({
             }}
           />
           {/* Diamond content (not clipped) */}
-          <div style={{ position: "relative", zIndex: 1 }}>
+          <div style={{ position: "relative", zIndex: 1, transform: "translateY(0.4em)" }}>
             <BaseDiamond bases={bases} />
           </div>
         </div>
