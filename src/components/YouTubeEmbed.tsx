@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 
 interface YouTubeEmbedProps {
   videoId: string;
@@ -18,6 +18,7 @@ export default function YouTubeEmbed({ videoId }: YouTubeEmbedProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const playerRef = useRef<any>(null);
+  const [muted, setMuted] = useState(true);
 
   const initPlayer = useCallback(() => {
     if (!containerRef.current || playerRef.current) return;
@@ -69,10 +70,71 @@ export default function YouTubeEmbed({ videoId }: YouTubeEmbedProps) {
     };
   }, [initPlayer]);
 
+  const toggleMute = () => {
+    if (!playerRef.current) return;
+    if (muted) {
+      playerRef.current.unMute();
+      playerRef.current.setVolume(100);
+    } else {
+      playerRef.current.mute();
+    }
+    setMuted(!muted);
+  };
+
   return (
     <div className="absolute inset-0">
       <div ref={containerRef} className="absolute inset-0" />
       <div className="absolute inset-0" style={{ pointerEvents: "all" }} />
+      <button
+        onClick={toggleMute}
+        className="absolute z-50"
+        style={{
+          bottom: "1em",
+          left: "1em",
+          fontSize: "1.2cqw",
+          width: "2.5em",
+          height: "2.5em",
+          background: "var(--bg-card)",
+          border: "1px solid var(--border)",
+          borderRadius: "var(--r-full)",
+          color: "var(--text)",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          transition: "transform var(--duration-fast) var(--ease-spring)",
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
+        onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+        onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.97)")}
+        onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
+        title={muted ? "Unmute" : "Mute"}
+      >
+        <svg
+          width="1.2em"
+          height="1.2em"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          {muted ? (
+            <>
+              <path d="M11 5L6 9H2v6h4l5 4V5z" />
+              <line x1="23" y1="9" x2="17" y2="15" />
+              <line x1="17" y1="9" x2="23" y2="15" />
+            </>
+          ) : (
+            <>
+              <path d="M11 5L6 9H2v6h4l5 4V5z" />
+              <path d="M19.07 4.93a10 10 0 010 14.14" />
+              <path d="M15.54 8.46a5 5 0 010 7.07" />
+            </>
+          )}
+        </svg>
+      </button>
     </div>
   );
 }
