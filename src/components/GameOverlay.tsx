@@ -392,20 +392,6 @@ function BaseDiamond({
         }}
         size={S}
       />
-      {/* Home plate — bottom center */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: "0.1em",
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: 0,
-          height: 0,
-          borderLeft: "0.35em solid transparent",
-          borderRight: "0.35em solid transparent",
-          borderTop: "0.4em solid var(--night-game)",
-        }}
-      />
     </div>
   );
 }
