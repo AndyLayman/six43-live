@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { useGameData } from "@/lib/useGameData";
 import { useReactions } from "@/lib/useReactions";
@@ -12,8 +12,33 @@ import ReactionButtons from "@/components/ReactionButtons";
 export default function Home() {
   const [videoId, setVideoId] = useState("");
   const [videoInput, setVideoInput] = useState("");
-  const [showUrlBar, setShowUrlBar] = useState(true);
+  const [showUrlBar, setShowUrlBar] = useState(false);
   const [gameId, setGameId] = useState<string | null>(null);
+  const [streamStatus, setStreamStatus] = useState<"checking" | "live" | "offline" | "manual">("checking");
+
+  // Check if the team YouTube channel is live
+  const checkLiveStatus = useCallback(async () => {
+    try {
+      const res = await fetch("/api/youtube/live");
+      const data = await res.json();
+      if (data.live && data.videoId) {
+        setVideoId(data.videoId);
+        setStreamStatus("live");
+        setShowUrlBar(false);
+      } else {
+        setStreamStatus((prev) => prev === "manual" ? "manual" : "offline");
+      }
+    } catch {
+      setStreamStatus((prev) => prev === "manual" ? "manual" : "offline");
+    }
+  }, []);
+
+  // Poll for live status
+  useEffect(() => {
+    checkLiveStatus();
+    const interval = setInterval(checkLiveStatus, 30000);
+    return () => clearInterval(interval);
+  }, [checkLiveStatus]);
 
   // Find the active game on load
   useEffect(() => {
@@ -42,6 +67,7 @@ export default function Home() {
     );
     setVideoId(match ? match[1] : videoInput.trim());
     setShowUrlBar(false);
+    setStreamStatus("manual");
   };
 
   // Derive overlay data from Supabase
@@ -90,9 +116,15 @@ export default function Home() {
             <svg style={{ width: "5em", height: "5em", color: "var(--text-dim)", marginBottom: "1em" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
             </svg>
-            <p style={{ fontSize: "1.1em", fontWeight: 400, color: "var(--text)" }}>No stream loaded</p>
+            <p style={{ fontSize: "1.1em", fontWeight: 400, color: "var(--text)" }}>
+              {streamStatus === "checking" ? "Checking for live stream..." : "Not currently live"}
+            </p>
             <p style={{ fontSize: "0.85em", color: "var(--text-dim)", marginTop: "0.3em" }}>
-              {loading ? "Looking for active game..." : "Press the URL button to enter a YouTube live stream"}
+              {streamStatus === "checking"
+                ? "Connecting to YouTube..."
+                : streamStatus === "offline"
+                ? "Waiting for stream to go live — or press TV to load manually"
+                : "Press TV to load a stream manually"}
             </p>
           </div>
         )}
