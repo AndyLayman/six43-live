@@ -101,12 +101,12 @@ export default function Home() {
           >
             <GameOverlay
               away={{
-                abbreviation: awayTeamName.slice(0, 4).toUpperCase(),
+                abbreviation: awayTeamName.slice(0, 2).toUpperCase(),
                 score: awayScore,
                 isUs: !isUsHome,
               }}
               home={{
-                abbreviation: homeTeamName.slice(0, 4).toUpperCase(),
+                abbreviation: homeTeamName.slice(0, 2).toUpperCase(),
                 score: homeScore,
                 isUs: isUsHome,
               }}

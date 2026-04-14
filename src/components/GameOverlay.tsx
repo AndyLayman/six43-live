@@ -27,130 +27,102 @@ export default function GameOverlay({
 }: GameOverlayProps) {
   return (
     <div style={{ display: "inline-flex", flexDirection: "column" }}>
-      {/* Scoreboard + Count/Bases */}
-      <div style={{ display: "flex", alignItems: "flex-end" }}>
-        {/* Left: Teams + Scores + Inning */}
-        <div style={{ display: "flex" }}>
-          {/* Teams + Scores */}
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <TeamRow
-              abbreviation={away.abbreviation}
-              score={away.score}
-              isUs={away.isUs}
-            />
-            <TeamRow
-              abbreviation={home.abbreviation}
-              score={home.score}
-              isUs={home.isUs}
-            />
-          </div>
-
-          {/* Inning */}
-          <div
-            style={{
-              width: CELL,
-              background: "var(--chalk)",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "0.1em",
-            }}
-          >
-            <span
-              style={{
-                fontSize: "0.7em",
-                lineHeight: 1,
-                color: "var(--night-game)",
-                opacity: isTopInning ? 1 : 0.2,
-                transition: "opacity var(--duration-fast) var(--ease-in-out)",
-              }}
-            >
-              &#9650;
-            </span>
-            <span
-              style={{
-                fontSize: "1.15em",
-                fontWeight: 700,
-                color: "var(--night-game)",
-                lineHeight: 1,
-              }}
-            >
-              {inning}
-            </span>
-            <span
-              style={{
-                fontSize: "0.7em",
-                lineHeight: 1,
-                color: "var(--night-game)",
-                opacity: !isTopInning ? 1 : 0.2,
-                transition: "opacity var(--duration-fast) var(--ease-in-out)",
-              }}
-            >
-              &#9661;
-            </span>
-          </div>
+      {/* Main scoreboard grid */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: `${CELL} ${CELL} ${CELL} 6em`,
+          gridTemplateRows: `3.2em ${CELL} ${CELL}`,
+        }}
+      >
+        {/* Bases diamond — row 1, col 4 */}
+        <div
+          style={{
+            gridColumn: 4,
+            gridRow: 1,
+            background: "var(--chalk)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <BaseDiamond bases={bases} />
         </div>
 
-        {/* Right: Bases + Count with pentagon background */}
-        <div style={{ position: "relative", width: "6.5em", height: "8em" }}>
-          {/* Pentagon background shape */}
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              background: "var(--chalk)",
-              clipPath:
-                "polygon(0% 40%, 8% 40%, 50% 2%, 92% 40%, 100% 40%, 100% 100%, 0% 100%)",
-            }}
-          />
+        {/* Away team cell */}
+        <TeamCell row={2} abbreviation={away.abbreviation} isUs={away.isUs} />
+        {/* Away score cell */}
+        <ScoreCell row={2} score={away.score} />
 
-          {/* Content */}
-          <div
+        {/* Inning — rows 2–3, col 3 */}
+        <div
+          style={{
+            gridColumn: 3,
+            gridRow: "2 / 4",
+            background: "var(--chalk)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "0.08em",
+          }}
+        >
+          <span
             style={{
-              position: "relative",
-              zIndex: 1,
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "space-between",
-              paddingTop: "0.6em",
-              paddingBottom: "0.3em",
+              fontSize: "0.75em",
+              lineHeight: 1,
+              color: "var(--night-game)",
+              opacity: isTopInning ? 1 : 0.18,
+              transition: "opacity var(--duration-fast) var(--ease-in-out)",
             }}
           >
-            {/* Bases diamond */}
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "0.1em",
-              }}
-            >
-              <Diamond active={bases.second} />
-              <div style={{ display: "flex", gap: "0.7em" }}>
-                <Diamond active={bases.third} />
-                <Diamond active={bases.first} />
-              </div>
-            </div>
-
-            {/* Count dots */}
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.15em",
-                alignSelf: "flex-start",
-                paddingLeft: "0.5em",
-              }}
-            >
-              <CountRow label="O" filled={outs} total={2} color="var(--night-game)" />
-              <CountRow label="S" filled={strikes} total={2} color="var(--stitch-red)" />
-              <CountRow label="B" filled={balls} total={3} color="var(--outfield)" />
-            </div>
-          </div>
+            &#9650;
+          </span>
+          <span
+            style={{
+              fontSize: "1.2em",
+              fontWeight: 700,
+              color: "var(--night-game)",
+              lineHeight: 1,
+            }}
+          >
+            {inning}
+          </span>
+          <span
+            style={{
+              fontSize: "0.75em",
+              lineHeight: 1,
+              color: "var(--night-game)",
+              opacity: !isTopInning ? 1 : 0.18,
+              transition: "opacity var(--duration-fast) var(--ease-in-out)",
+            }}
+          >
+            &#9661;
+          </span>
         </div>
+
+        {/* Count (O/S/B) — rows 2–3, col 4 */}
+        <div
+          style={{
+            gridColumn: 4,
+            gridRow: "2 / 4",
+            background: "var(--chalk)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            gap: "0.2em",
+            paddingLeft: "0.6em",
+          }}
+        >
+          <CountRow label="O" filled={outs} total={2} color="var(--night-game)" />
+          <CountRow label="S" filled={strikes} total={2} color="var(--stitch-red)" />
+          <CountRow label="B" filled={balls} total={3} color="var(--outfield)" />
+        </div>
+
+        {/* Home team cell */}
+        <TeamCell row={3} abbreviation={home.abbreviation} isUs={home.isUs} />
+        {/* Home score cell */}
+        <ScoreCell row={3} score={home.score} />
       </div>
 
       {/* Batter bar */}
@@ -159,19 +131,19 @@ export default function GameOverlay({
           <div
             style={{
               width: CELL,
+              padding: "0.35em 0",
               background: "var(--dirt)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              padding: "0.3em 0",
             }}
           >
             <span
               style={{
-                fontSize: "0.65em",
-                fontWeight: 500,
+                fontSize: "0.7em",
+                fontWeight: 600,
                 color: "var(--chalk)",
-                letterSpacing: "0.05em",
+                letterSpacing: "0.04em",
               }}
             >
               AB
@@ -183,7 +155,7 @@ export default function GameOverlay({
               background: "var(--chalk)",
               display: "flex",
               alignItems: "center",
-              padding: "0.3em 0.6em",
+              padding: "0.35em 0.6em",
             }}
           >
             <span
@@ -191,7 +163,7 @@ export default function GameOverlay({
                 fontSize: "0.8em",
                 fontWeight: 400,
                 color: "var(--night-game)",
-                letterSpacing: "0.03em",
+                letterSpacing: "0.02em",
               }}
             >
               {batter.number != null && `#${batter.number} `}
@@ -204,60 +176,85 @@ export default function GameOverlay({
   );
 }
 
-function TeamRow({
+/* ── Sub-components ── */
+
+function TeamCell({
+  row,
   abbreviation,
-  score,
   isUs,
 }: {
+  row: number;
   abbreviation: string;
-  score: number;
   isUs: boolean;
 }) {
   return (
-    <div style={{ display: "flex" }}>
-      {/* Team cell */}
-      <div
+    <div
+      style={{
+        gridColumn: 1,
+        gridRow: row,
+        background: isUs ? "var(--dirt)" : "var(--night-game)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <span
         style={{
-          width: CELL,
-          height: CELL,
-          background: isUs ? "var(--dirt)" : "var(--night-game)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          fontWeight: 700,
+          fontSize: "0.95em",
+          color: isUs ? "var(--clay)" : "var(--chalk)",
+          letterSpacing: "0.06em",
         }}
       >
-        <span
-          style={{
-            fontWeight: 700,
-            fontSize: "0.9em",
-            color: isUs ? "var(--clay)" : "var(--chalk)",
-            letterSpacing: "0.05em",
-          }}
-        >
-          {abbreviation}
-        </span>
-      </div>
-      {/* Score cell */}
-      <div
+        {abbreviation.slice(0, 2).toUpperCase()}
+      </span>
+    </div>
+  );
+}
+
+function ScoreCell({ row, score }: { row: number; score: number }) {
+  return (
+    <div
+      style={{
+        gridColumn: 2,
+        gridRow: row,
+        background: "var(--chalk)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <span
         style={{
-          width: CELL,
-          height: CELL,
-          background: "var(--chalk)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          fontSize: "1.6em",
+          fontWeight: 700,
+          color: "var(--night-game)",
+          lineHeight: 1,
         }}
       >
-        <span
-          style={{
-            fontSize: "1.5em",
-            fontWeight: 700,
-            color: "var(--night-game)",
-            lineHeight: 1,
-          }}
-        >
-          {score}
-        </span>
+        {score}
+      </span>
+    </div>
+  );
+}
+
+function BaseDiamond({
+  bases,
+}: {
+  bases: { first: boolean; second: boolean; third: boolean };
+}) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      <Diamond active={bases.second} />
+      <div style={{ display: "flex", gap: "0.9em", marginTop: "-0.2em" }}>
+        <Diamond active={bases.third} />
+        <Diamond active={bases.first} />
       </div>
     </div>
   );
@@ -267,10 +264,10 @@ function Diamond({ active }: { active: boolean }) {
   return (
     <div
       style={{
-        width: "1.2em",
-        height: "1.2em",
+        width: "1.3em",
+        height: "1.3em",
         transform: "rotate(45deg)",
-        border: `0.15em solid ${active ? "var(--chalk)" : "var(--night-game)"}`,
+        border: `0.13em solid ${active ? "var(--chalk)" : "var(--night-game)"}`,
         background: active ? "var(--night-game)" : "var(--chalk)",
         transition: "all var(--duration-fast) var(--ease-in-out)",
       }}
@@ -290,10 +287,10 @@ function CountRow({
   color: string;
 }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "0.25em" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: "0.3em" }}>
       <span
         style={{
-          fontSize: "0.65em",
+          fontSize: "0.85em",
           fontWeight: 700,
           color: "var(--night-game)",
           width: "1em",
@@ -301,15 +298,15 @@ function CountRow({
       >
         {label}
       </span>
-      <div style={{ display: "flex", gap: "0.25em" }}>
+      <div style={{ display: "flex", gap: "0.3em" }}>
         {Array.from({ length: total }, (_, i) => (
           <div
             key={i}
             style={{
-              width: "0.5em",
-              height: "0.5em",
+              width: "0.55em",
+              height: "0.55em",
               borderRadius: "50%",
-              border: `1.5px solid ${i < filled ? color : "var(--night-game)"}`,
+              border: `2px solid ${i < filled ? color : "var(--night-game)"}`,
               background: i < filled ? color : "var(--chalk)",
               transition: "all var(--duration-fast) var(--ease-in-out)",
             }}
