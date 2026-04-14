@@ -80,7 +80,7 @@ export default function GameOverlay({
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            gap: "0.08em",
+            gap: "0.25em",
           }}
         >
           {isTopInning ? (
