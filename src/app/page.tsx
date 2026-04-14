@@ -99,10 +99,10 @@ export default function Home() {
 
         {/* Layer 2: Baseball Overlay */}
         <div className="absolute inset-0 pointer-events-none" style={{ fontSize: "1.2cqw" }}>
-          {/* Top-left: Unified scoreboard */}
+          {/* Bottom-left: Unified scoreboard */}
           <div
             className="absolute pointer-events-auto"
-            style={{ top: "4em", left: "1.5em" }}
+            style={{ bottom: "4em", left: "1.5em" }}
           >
             <GameOverlay
               away={{
