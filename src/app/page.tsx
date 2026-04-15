@@ -227,6 +227,7 @@ export default function Home() {
                     }
                   : null
               }
+              pitcher={null}
             />
           </div>
 
